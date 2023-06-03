@@ -21,13 +21,20 @@ func Register(c *fiber.Ctx) error {
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
-	user := database.User{
+	user := database.Account{
 		Name:     data["name"],
 		Email:    data["email"],
 		Password: password,
 	}
 
-	database.DB.Create(&user)
+	query := `INSERT INTO accounts(name, email, password) VALUES (:name, :email, :password)`
+	err := database.InsertRow(query, &user)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Такие логин или пароль уже используются",
+		})
+	}
 
 	return c.JSON(user)
 
@@ -40,21 +47,20 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	var user database.User
-
-	database.DB.Where("email = ?", data["email"]).First(&user)
+	var user database.Account
+	database.QueryRow("SELECT * FROM accounts WHERE name = '"+data["name"]+"'", &user)
 
 	if user.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		return c.JSON(fiber.Map{
-			"message": "user not found",
+			"message": "Пользователь не найден",
 		})
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "incorrect password",
+			"message": "Неверный пароль",
 		})
 	}
 
@@ -68,10 +74,9 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
-			"message": "could not login",
+			"message": "Не существует введенного логина",
 		})
 	}
-
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    token,
@@ -83,6 +88,7 @@ func Login(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "success",
+		"token":   token,
 	})
 }
 
@@ -118,9 +124,8 @@ func GetUser(c *fiber.Ctx) error {
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
-	var user database.User
-
-	database.DB.Where("id = ?", claims.Issuer).First(&user)
+	var user database.Account
+	database.QueryRow("SELECT * FROM accounts WHERE id = "+claims.Id, &user)
 
 	return c.JSON(user)
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <script src="js/script.js"></script>
+    <title>Authorization</title>
+</head>
+<body id="loading">
+    <div class="container">
+        <img id="logo" src="https://tpu.ru//upload/medialibrary/34a/6zq882c3espm1kncooywvbykp1psyqbr/gorizontalnyy-blok.png">
+        
+        <div class="input-container">
+            <label for="uname">Логин:</label>
+            <input type="text" placeholder="Введите логин" name="uname" id="input-name" required>
+        </div>
+        <div class="input-container" id="input-container-email">
+            <label for="email">Почта:</label>
+            <input type="email" placeholder="Введите почту" name="email" id="input-email" required>
+        </div>
+        <div class="input-container">
+            <label for="pswd">Пароль:</label>
+            <input type="password" placeholder="Введите пароль" name="pass" id="input-pass" required>
+        </div>
+        <span id="span-error"></span>
+        <button type="submit" onclick="submitPress()" id="btn-submit">Войти в аккаунт</button>
+        <div class="reg-or-remind">
+            <a class="btn-link" id="switch-auth" onclick="switchAuth()">
+            Регистрация	</a>
+        </div>
+    </div>
+    
+</body>
+</html>

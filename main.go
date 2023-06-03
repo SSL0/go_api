@@ -9,17 +9,17 @@ import (
 
 func main() {
 	database.Connect()
+	defer database.Disconnect()
 
 	app := fiber.New()
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
-	api := app.Group("/auth")
-	api.Post("/register", auth.Register)
-	api.Post("/login", auth.Login)
-	api.Post("/logout", auth.Logout)
-	api.Post("/get-user", auth.GetUser)
+	app.Static("/", "./public/")
+	app.Static("/auth/", "./public/auth")
+
+	api_auth := app.Group("/api/auth")
+	api_auth.Post("/register", auth.Register)
+	api_auth.Post("/login", auth.Login)
+	api_auth.Post("/logout", auth.Logout)
+	api_auth.Get("/get-user", auth.GetUser)
 
 	app.Listen(":8000")
-
 }

@@ -2,9 +2,12 @@ package database
 
 import (
 	"fmt"
-	"log"
+	"os"
+	"time"
 
-	"gorm.io/driver/postgres"
+	"github.com/jmoiron/sqlx"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +16,15 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email" gorm:"unique"`
 	Password []byte `json:"-"`
+}
+
+type Account struct {
+	ID        uint
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  []byte    `json:"-"`
+	CreatedAt time.Time `db:"created_at"`
+	LastLogin time.Time `db:"last_login"`
 }
 
 const (
@@ -27,15 +39,34 @@ var db_params string = fmt.Sprintf("host=%s port=%d user=%s "+
 	"password=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai",
 	host, port, user, password, dbname)
 
-var DB *gorm.DB
+var DB *sqlx.DB
 
 func Connect() {
-	db, err := gorm.Open(postgres.Open(db_params), &gorm.Config{})
+	db, err := sqlx.Open("pgx", db_params)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
 	DB = db
-	fmt.Print(db)
+}
 
-	db.AutoMigrate(&User{})
+func Disconnect() {
+	DB.Close()
+}
+
+func QueryRow(query string, account *Account) error {
+	err := DB.QueryRowx(query).StructScan(account)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to Query Row: %v\n", err)
+	}
+	return err
+}
+
+func InsertRow(query string, account *Account) error {
+	_, err := DB.NamedExec(query, account)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to Insert Row: %v\n", err)
+	}
+	return err
+
 }
