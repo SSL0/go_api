@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"go_api/database"
 	"strconv"
 	"time"
@@ -56,7 +57,6 @@ func Login(c *fiber.Ctx) error {
 			"message": "Пользователь не найден",
 		})
 	}
-
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
@@ -68,7 +68,6 @@ func Login(c *fiber.Ctx) error {
 		Issuer:    strconv.Itoa(int(user.ID)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
-
 	token, err := claims.SignedString([]byte(SecretKey))
 
 	if err != nil {
@@ -77,18 +76,19 @@ func Login(c *fiber.Ctx) error {
 			"message": "Не существует введенного логина",
 		})
 	}
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24),
-		HTTPOnly: true,
-	}
+	// cookie := fiber.Cookie{
+	// 	Name:     "jwt",
+	// 	Value:    token,
+	// 	Expires:  time.Now().Add(time.Hour * 24),
+	// 	HTTPOnly: true,
+	// }
 
-	c.Cookie(&cookie)
+	// c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{
 		"message": "success",
 		"token":   token,
+		"expires": time.Now().Add(time.Hour * 24),
 	})
 }
 
@@ -114,8 +114,8 @@ func GetUser(c *fiber.Ctx) error {
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
-
 	if err != nil {
+		fmt.Println(err)
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "unauthenticated",
@@ -125,7 +125,7 @@ func GetUser(c *fiber.Ctx) error {
 	claims := token.Claims.(*jwt.StandardClaims)
 
 	var user database.Account
-	database.QueryRow("SELECT * FROM accounts WHERE id = "+claims.Id, &user)
+	database.QueryRow("SELECT * FROM accounts WHERE id = "+claims.Issuer, &user)
 
 	return c.JSON(user)
 

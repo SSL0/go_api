@@ -1,0 +1,51 @@
+@font-face {
+    font-family: ALS_Sirius;
+    src: url(../font/ALS_Sirius_Regular_0.95.otf);
+}
+@font-face {
+    font-family: ALS_Sirius;
+    src: url(../font/ALS_Sirius_Bold_0.95.otf);
+    font-weight: bold;
+}
+
+body {
+    font-family: ALS_Sirius;
+}
+
+#span-greeting {
+    font-family: ALS_Sirius;
+    font-weight: bold;
+    font-size: 50px;
+}
+
+#logo{
+    width: 200px;
+}
+
+.header-logo{
+    display: inline-block;
+
+}
+
+nav {
+    padding: 10px
+}
+
+ul {
+    list-style-type: none;
+    display: inline;
+    float: right
+}
+
+ul li{
+    display: inline;
+}
+
+#li-logout{
+    color: #ff4460;
+}
+
+#li-logout:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -1,5 +1,7 @@
 let isRegister = false;
+let res; // for debugging
 
+// Post request to api
 const sendPostRequest = async (url, data) => {
     return fetch(url, {
       method: 'POST',
@@ -7,9 +9,6 @@ const sendPostRequest = async (url, data) => {
       body: JSON.stringify(data)
     })
       .then(response => response.json())
-      .then(data => {
-        return data;
-      })
       .catch(error => console.log(error));
 }
 
@@ -34,9 +33,8 @@ const submitPress = async () => {
     document.getElementById('btn-submit').style.opacity = '0.8';
     if(isRegister){
         await register(name, email, pass)
-    } else{
-        await login(name, pass);
     }
+    await login(name, pass);
     document.getElementById('btn-submit').style.opacity = '';
 }
 
@@ -47,7 +45,10 @@ const login = async (name, pass) => {
     }
     const response = await sendPostRequest('/api/auth/login', body);
     if(response.message == "success"){
-        window.location.href = "/";
+        res = response;
+        document.cookie = "jwt=" + response.token + "; path=/; expires=" + response.expires + "; SameSite=lax";
+        console.log(sendPostRequest("/api/auth/get-user", body))
+        window.location.href = "/home/";
     } else{
         document.getElementById('span-error').style.display = 'block';
         document.getElementById('span-error').textContent = '*' + response.message;
@@ -56,7 +57,6 @@ const login = async (name, pass) => {
 }
 
 const register = async (name, email, pass) => {
-
     const body = {
         name: name,
         email: email,
