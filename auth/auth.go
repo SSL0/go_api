@@ -76,14 +76,6 @@ func Login(c *fiber.Ctx) error {
 			"message": "Не существует введенного логина",
 		})
 	}
-	// cookie := fiber.Cookie{
-	// 	Name:     "jwt",
-	// 	Value:    token,
-	// 	Expires:  time.Now().Add(time.Hour * 24),
-	// 	HTTPOnly: true,
-	// }
-
-	// c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{
 		"message": "success",
@@ -105,7 +97,6 @@ func Logout(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "success",
 	})
-
 }
 
 func GetUser(c *fiber.Ctx) error {

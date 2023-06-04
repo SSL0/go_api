@@ -8,15 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Name     string `json:"name"`
-	Email    string `json:"email" gorm:"unique"`
-	Password []byte `json:"-"`
-}
 
 type Account struct {
 	ID        uint
@@ -25,6 +17,7 @@ type Account struct {
 	Password  []byte    `json:"-"`
 	CreatedAt time.Time `db:"created_at"`
 	LastLogin time.Time `db:"last_login"`
+	Balance   uint      `json:"balance"`
 }
 
 const (
@@ -40,6 +33,23 @@ var db_params string = fmt.Sprintf("host=%s port=%d user=%s "+
 	host, port, user, password, dbname)
 
 var DB *sqlx.DB
+
+func AutoMigrate() {
+	query := `CREATE TABLE persons (
+				id Serial PRIMARY KEY,
+				name text UNIQUE,
+				email text UNIQUE,
+				password bytea,
+				created_at timestamp with time zone DEFAULT NOW(),
+				last_login timestamp with time zone DEFAULT NOW(),
+				balance int DEFAULT 0
+			);`
+	if DB == nil {
+		fmt.Fprintf(os.Stderr, "ERR: No connection to database")
+		os.Exit(1)
+	}
+	DB.MustExec(query)
+}
 
 func Connect() {
 	db, err := sqlx.Open("pgx", db_params)

@@ -9,6 +9,7 @@ import (
 
 func main() {
 	database.Connect()
+	// database.AutoMigrate()
 	defer database.Disconnect()
 
 	app := fiber.New()
