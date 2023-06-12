@@ -23,7 +23,7 @@ const main = async() => {
     if(response.message == 'unauthenticated'){
         window.location.href = "/auth/";
     }
-    document.getElementById('span-greeting').textContent = "Привет, " + response.name + "!";
+    document.getElementById('div-greeting').textContent = "Привет, " + response.name + "!";
         
 }
 

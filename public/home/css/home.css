@@ -12,12 +12,6 @@ body {
     font-family: ALS_Sirius;
 }
 
-#span-greeting {
-    font-family: ALS_Sirius;
-    font-weight: bold;
-    font-size: 50px;
-}
-
 #logo{
     width: 200px;
 }
@@ -48,4 +42,37 @@ ul li{
 #li-logout:hover{
     text-decoration: underline;
     cursor: pointer;
+}
+
+#div-greeting {
+    margin: 0 auto;
+    font-family: ALS_Sirius;
+    font-weight: bold;
+    font-size: 50px;
+    width: 100%;
+    text-align: center;
+}
+
+.balance-text{
+    margin: auto;
+    width: fit-content;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.balance-btn{
+    background-color: #28be46;;
+    border-radius: 10px;
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    width: fit-content;
+    margin: auto;
+    padding: 10px 50px 10px 50px;
+
+
+}
+
+.balance-btn:hover{
+    opacity: 0.8;
 }

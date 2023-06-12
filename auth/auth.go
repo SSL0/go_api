@@ -43,7 +43,8 @@ func Register(c *fiber.Ctx) error {
 
 func Login(c *fiber.Ctx) error {
 	var data map[string]string
-
+	head := c.Request().Header.Peek("Content-Type")
+	fmt.Println(string(head))
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
