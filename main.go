@@ -10,7 +10,7 @@ import (
 
 func main() {
 	database.Connect()
-	// database.AutoMigrate()
+	database.AutoMigrate()
 	defer database.Disconnect()
 
 	app := fiber.New()
@@ -29,7 +29,6 @@ func main() {
 	api_user.Get("/click", user.Click)
 
 	api_user.Post("/get-user", user.GetUser)
-	api_user.Post("/change-attr", user.GetUser)
 
-	app.Listen(":8000")
+	app.Listen(":80")
 }

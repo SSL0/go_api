@@ -21,7 +21,7 @@ type Account struct {
 }
 
 const (
-	host     = "localhost"
+	host     = "postgres"
 	port     = 5432
 	user     = "am"
 	password = "postgres"
@@ -35,7 +35,7 @@ var db_params string = fmt.Sprintf("host=%s port=%d user=%s "+
 var DB *sqlx.DB
 
 func AutoMigrate() {
-	query := `CREATE TABLE persons (
+	query := `CREATE TABLE accounts (
 				id Serial PRIMARY KEY,
 				name text UNIQUE,
 				email text UNIQUE,
@@ -48,7 +48,11 @@ func AutoMigrate() {
 		fmt.Fprintf(os.Stderr, "ERR: No connection to database")
 		os.Exit(1)
 	}
-	DB.MustExec(query)
+	_, err := DB.Exec(query)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+	}
 }
 
 func Connect() {

@@ -29,16 +29,36 @@ const switchAuth = () =>{
 }
 
 const submitPress = async () => {
-    const name = document.getElementById('input-name').value;
-    const email = document.getElementById('input-email').value;
-    const pass = document.getElementById('input-pass').value;
+    const inputName = document.getElementById('input-name');
+    const inputEmail = document.getElementById('input-email');
+    const inputPass = document.getElementById('input-pass');
 
+    const name = inputName.value;
+    const email = inputEmail.value;
+    const pass = inputPass.value;
+
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+    let errorMessage = "* ";
+    if(name.length < 5){
+        errorMessage += "Короткое имя пользователя.\n"
+    }
+    if(isRegister && !email.match(emailRegex)){
+        errorMessage += "Адрес электронной почты не корректен\n"
+    }
+    if(pass.length < 3){
+        errorMessage += "Короткий пароль.\n"
+    }
+
+    if(errorMessage.length > 2){
+        document.getElementById('span-error').style.display = 'block';
+        document.getElementById('span-error').textContent = errorMessage;
+        return;
+    }
 
     document.getElementById('btn-submit').style.opacity = '0.8';
     if (isRegister && await register(name, email, pass) == false){
-        if(!success){
-            return;
-        }
+        return;
     }
     await login(name, pass);
 

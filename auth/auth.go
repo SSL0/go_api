@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go_api/database"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 )
 
 const SecretKey = "secret"
+const emailRegex = "/^[a-zA-Z0-9.!#$%&'*+\\=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$/"
 
 func Register(c *fiber.Ctx) error {
 	var data map[string]string
@@ -21,10 +23,12 @@ func Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	if len(data["name"]) < 5 || len(data["email"]) < 5 || len(data["password"]) < 5 {
+	matched, _ := regexp.MatchString(emailRegex, data["email"])
+	fmt.Println(matched)
+	if len(data["name"]) < 5 || len(data["password"]) < 1 || matched {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "Incorrect input data",
+			"message": "Неверно введены данные",
 		})
 	}
 
@@ -59,9 +63,24 @@ func Login(c *fiber.Ctx) error {
 		return err
 	}
 
+	if len(data["name"]) < 5 || len(data["password"]) < 1 {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Неверно введены данные",
+		})
+	}
+
 	var user database.Account
 	query := "SELECT * FROM accounts WHERE name = $1"
-	database.DB.QueryRowx(query, data["name"]).StructScan(&user)
+	err := database.DB.QueryRowx(query, data["name"]).StructScan(&user)
+	if err != nil {
+		fmt.Println(err)
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "Логин не найден",
+		})
+	}
+
 	if user.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		return c.JSON(fiber.Map{
@@ -84,7 +103,7 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		c.Status(fiber.StatusInternalServerError)
 		return c.JSON(fiber.Map{
-			"message": "Не существует введенного логина",
+			"message": "Внутренняя ошибка сервера",
 		})
 	}
 
