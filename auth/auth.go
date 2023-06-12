@@ -21,6 +21,13 @@ func Register(c *fiber.Ctx) error {
 		return err
 	}
 
+	if len(data["name"]) < 5 || len(data["email"]) < 5 || len(data["password"]) < 5 {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Incorrect input data",
+		})
+	}
+
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
 	user := database.Account{
@@ -39,7 +46,9 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(fiber.Map{
+		"message": "success",
+	})
 
 }
 
@@ -82,7 +91,6 @@ func Login(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "success",
 		"token":   token,
-		"expires": time.Now().Add(time.Hour * 24),
 	})
 }
 
@@ -124,7 +132,7 @@ func GetUser(c *fiber.Ctx) error {
 
 	var user database.Account
 	query := "SELECT * FROM accounts WHERE id = $1"
-	database.DB.QueryRowx(query, claims.Issuer).StructScan(user)
+	database.DB.QueryRowx(query, claims.Issuer).StructScan(&user)
 
 	return c.JSON(user)
 }

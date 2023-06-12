@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/home/img/favicon.ico">
     <link rel="stylesheet" href="/home/css/normalize.css">
     <link rel="stylesheet" href="/home/css/home.css">
     <script src="/home/js/script.js"></script>
-    <title>Document</title>
+    <title>AM GAME | Главная</title>
 </head>
 <body>
     <header>
@@ -17,18 +18,18 @@
                     class="nav__link"
                     id="header-link-to-main"
                     href="#"
-                ><img id="logo" src="https://tpu.ru//upload/medialibrary/34a/6zq882c3espm1kncooywvbykp1psyqbr/gorizontalnyy-blok.png" alt="Логотип"/></a>         
+                ><img id="logo" src="/home/img/gorizontalnyy-blok.png" alt="Логотип"/></a>         
             </div>
             <ul>
-                <li id="li-logout" onclick="logout();">Выход</li>
+                <li id="li-logout" onclick="logoutClicked();">Выход</li>
             </ul>
         </nav>       
     </header>
 
     <div id="div-greeting">Приветствую, </div>
     <div class="user-balance">
-        <div class="balance-text">У вас на счету: 0</div>
-        <a href="#" class="balance-btn">КЛИК</a>
+        <div class="balance-text">У вас на счету: <span id="balance-value">0</span></div>
+        <a class="balance-btn" onclick="clickButtonClicked();">КЛИК</a>
     </div>
 </body>
 </html>

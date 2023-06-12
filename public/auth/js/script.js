@@ -13,6 +13,8 @@ const sendPostRequest = async (url, data, token) => {
       .catch(error => console.log(error));
 }
 
+
+
 const switchAuth = () =>{
     if(isRegister){
         document.getElementById('input-container-email').style.display = 'none';
@@ -31,11 +33,15 @@ const submitPress = async () => {
     const email = document.getElementById('input-email').value;
     const pass = document.getElementById('input-pass').value;
 
+
     document.getElementById('btn-submit').style.opacity = '0.8';
-    if(isRegister){
-        await register(name, email, pass)
+    if (isRegister && await register(name, email, pass) == false){
+        if(!success){
+            return;
+        }
     }
     await login(name, pass);
+
     document.getElementById('btn-submit').style.opacity = '';
 }
 
@@ -66,10 +72,11 @@ const register = async (name, email, pass) => {
     const response = await sendPostRequest('/api/auth/register', body);
 
     if(response.message == "success"){
-        window.location.href = "/";
+        return true;
     } else{
         document.getElementById('span-error').style.display = 'block';
         document.getElementById('span-error').textContent = '*' + response.message;
+        return false;
     }
 }
 

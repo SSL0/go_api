@@ -2,6 +2,7 @@
 form {
 	border: 3px solid #f1f1f1;
 }
+
 #logo{
 	display: block;
 	-webkit-user-select: none;
@@ -11,6 +12,7 @@ form {
 	width: 250px;
 }  
 
+  
 button {
 	display: block;
 	background-color: #28be46;
@@ -94,3 +96,15 @@ button:hover {
 #switch-auth{
 	margin: auto;
 }
+
+@media screen and (max-width: 720px) {
+	#logo{
+		width: 300px;
+	}  
+	.container{
+		width: 60%;
+	}
+	
+}
+
+	

@@ -69,7 +69,7 @@ ul li{
     width: fit-content;
     margin: auto;
     padding: 10px 50px 10px 50px;
-
+    cursor: pointer;
 
 }
 

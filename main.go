@@ -25,7 +25,11 @@ func main() {
 	// api_auth.Post("/get-user", auth.GetUser)
 
 	api_user := app.Group("/api/user")
+	api_user.Get("/balance", user.GetBalance)
+	api_user.Get("/click", user.Click)
+
 	api_user.Post("/get-user", user.GetUser)
+	api_user.Post("/change-attr", user.GetUser)
 
 	app.Listen(":8000")
 }
