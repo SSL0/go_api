@@ -18,7 +18,7 @@ const logout = () => {
 
 const main = async() => {
     // Check, is user authorized
-    const response = await sendPostRequest("/api/auth/get-user", {});
+    const response = await sendPostRequest("/api/user/get-user", {});
     res = response;
     if(response.message == 'unauthenticated'){
         window.location.href = "/auth/";

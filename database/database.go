@@ -63,20 +63,3 @@ func Connect() {
 func Disconnect() {
 	DB.Close()
 }
-
-func QueryRow(query string, account *Account) error {
-	err := DB.QueryRowx(query).StructScan(account)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to Query Row: %v\n", err)
-	}
-	return err
-}
-
-func InsertRow(query string, account *Account) error {
-	_, err := DB.NamedExec(query, account)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to Insert Row: %v\n", err)
-	}
-	return err
-
-}

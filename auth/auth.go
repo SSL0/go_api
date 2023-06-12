@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"go_api/database"
+	"os"
 	"strconv"
 	"time"
 
@@ -29,8 +30,9 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	query := `INSERT INTO accounts(name, email, password) VALUES (:name, :email, :password)`
-	err := database.InsertRow(query, &user)
+	_, err := database.DB.NamedExec(query, user)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to Insert Row: %v\n", err)
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
 			"message": "Такие логин или пароль уже используются",
@@ -43,15 +45,14 @@ func Register(c *fiber.Ctx) error {
 
 func Login(c *fiber.Ctx) error {
 	var data map[string]string
-	head := c.Request().Header.Peek("Content-Type")
-	fmt.Println(string(head))
+
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
 
 	var user database.Account
-	database.QueryRow("SELECT * FROM accounts WHERE name = '"+data["name"]+"'", &user)
-
+	query := "SELECT * FROM accounts WHERE name = $1"
+	database.DB.QueryRowx(query, data["name"]).StructScan(&user)
 	if user.ID == 0 {
 		c.Status(fiber.StatusNotFound)
 		return c.JSON(fiber.Map{
@@ -101,23 +102,45 @@ func Logout(c *fiber.Ctx) error {
 }
 
 func GetUser(c *fiber.Ctx) error {
+
 	cookie := c.Cookies("jwt")
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
 	if err != nil {
+		v, _ := err.(*jwt.ValidationError)
+
+		if v.Errors == jwt.ValidationErrorExpired {
+			c.Status(fiber.StatusUnauthorized)
+			return c.JSON(fiber.Map{
+				"message": "unauthenticated",
+			})
+		}
 		fmt.Println(err)
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
-			"message": "unauthenticated",
-		})
 	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
 
 	var user database.Account
-	database.QueryRow("SELECT * FROM accounts WHERE id = "+claims.Issuer, &user)
+	query := "SELECT * FROM accounts WHERE id = $1"
+	database.DB.QueryRowx(query, claims.Issuer).StructScan(user)
 
 	return c.JSON(user)
+}
+
+func IsAuthorized(tokenString string) bool {
+	_, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+	if err != nil {
+		v, _ := err.(*jwt.ValidationError)
+
+		if v.Errors == jwt.ValidationErrorExpired {
+			return false
+		}
+		fmt.Println(err)
+	}
+
+	return true
 }

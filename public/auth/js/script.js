@@ -2,10 +2,11 @@ let isRegister = false;
 let res; // for debugging
 
 // Post request to api
-const sendPostRequest = async (url, data) => {
+const sendPostRequest = async (url, data, token) => {
     return fetch(url, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json',
+                'Authorizaion': 'Bearer: ' + token},
       body: JSON.stringify(data)
     })
       .then(response => response.json())
@@ -47,7 +48,7 @@ const login = async (name, pass) => {
     if(response.message == "success"){
         res = response;
         document.cookie = "jwt=" + response.token + "; path=/; expires=" + response.expires + "; SameSite=lax";
-        console.log(sendPostRequest("/api/auth/get-user", body))
+        console.log(sendPostRequest("/api/user/get-user", body))
         window.location.href = "/home/";
     } else{
         document.getElementById('span-error').style.display = 'block';
@@ -71,3 +72,15 @@ const register = async (name, email, pass) => {
         document.getElementById('span-error').textContent = '*' + response.message;
     }
 }
+
+const main = async() => {
+    // Check, is user unauthorized
+    const response = await sendPostRequest("/api/user/get-user", {});
+    res = response;
+    if(response.message === undefined){
+        window.location.href = "/home/";
+    } 
+ 
+}
+
+main();
