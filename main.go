@@ -23,5 +23,9 @@ func main() {
 	api_auth.Post("/logout", auth.Logout)
 	api_auth.Post("/get-user", auth.GetUser)
 
+	api_user := app.Group("/api/user")
+	api_user.Post("/money", auth.Register)
+	api_user.Post("/addupgrade", auth.Register)
+
 	app.Listen(":8000")
 }
