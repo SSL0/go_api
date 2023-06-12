@@ -120,5 +120,4 @@ func GetUser(c *fiber.Ctx) error {
 	database.QueryRow("SELECT * FROM accounts WHERE id = "+claims.Issuer, &user)
 
 	return c.JSON(user)
-
 }

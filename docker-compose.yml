@@ -8,7 +8,6 @@ services:
     tty: true
     build:
       context: .
-    command: tail -F anything
     depends_on:
       - postgres
     ports:
